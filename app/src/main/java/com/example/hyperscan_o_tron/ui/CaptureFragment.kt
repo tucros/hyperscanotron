@@ -17,16 +17,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.example.hyperscan_o_tron.R
 import com.example.hyperscan_o_tron.data.AppDatabase
 import com.example.hyperscan_o_tron.data.Product
 import com.example.hyperscan_o_tron.databinding.FragmentCaptureBinding
 import com.example.hyperscan_o_tron.utils.FileUtils
-import com.example.hyperscan_o_tron.utils.ImageUtils
 import kotlinx.coroutines.launch
-import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -90,6 +86,7 @@ class CaptureFragment : Fragment() {
             // Save product data to the database
             saveProductData()
             // Navigate back to the scanner or product list
+
         }
     }
 
@@ -126,10 +123,22 @@ class CaptureFragment : Fragment() {
 
     private fun takePhoto(fileName: String) {
         // Create output directory and file
-        val photoFile = FileUtils.createFile(requireContext(), upcCode, fileName)
+        val photoUri = FileUtils.createFile(requireContext(), upcCode, fileName)
 
-        // Create output options
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+        if (photoUri == null) {
+            Log.e(TAG, "Failed to create file URI")
+            return
+        }
+
+        // Open an OutputStream from the Uri
+        val outputStream = requireContext().contentResolver.openOutputStream(photoUri)
+        if (outputStream == null) {
+            Log.e(TAG, "Failed to open output stream for Uri: $photoUri")
+            return
+        }
+
+        // Use File-based OutputFileOptions instead of ContentResolver-based
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(outputStream).build()
 
         // Take the picture
         imageCapture.takePicture(
@@ -137,13 +146,13 @@ class CaptureFragment : Fragment() {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     lifecycleScope.launch {
-                        // Compress the image
-                        ImageUtils.compressImage(requireContext(), photoFile)
+                        // Optionally compress the image after capture
+                        // ImageUtils.compressImage(requireContext(), Uri.fromFile(photoFile))
 
                         // Update UI with thumbnail or confirmation
-                        updateThumbnail(fileName, photoFile)
+                        updateThumbnail(fileName, photoUri)
 
-                        Log.d(TAG, "Photo saved: ${photoFile.absolutePath}")
+                        Log.d(TAG, "Photo saved: $photoUri")
                     }
                 }
 
@@ -155,16 +164,16 @@ class CaptureFragment : Fragment() {
     }
 
     private fun saveProductData() {
-        val shelfTagPath = FileUtils.getFilePath(requireContext(), upcCode, "shelf_tag.jpg")
-        val frontImagePath = FileUtils.getFilePath(requireContext(), upcCode, "front.jpg")
-        val backImagePath = FileUtils.getFilePath(requireContext(), upcCode, "back.jpg")
+        val shelfTagUri = FileUtils.getFilePath(requireContext(), upcCode, "shelf_tag.jpg")
+        val frontImageUri = FileUtils.getFilePath(requireContext(), upcCode, "front.jpg")
+        val backImageUri = FileUtils.getFilePath(requireContext(), upcCode, "back.jpg")
 
         val product = Product(
             upcCode = upcCode,
             timestamp = System.currentTimeMillis(),
-            shelfTagPath = shelfTagPath,
-            frontImagePath = frontImagePath,
-            backImagePath = backImagePath
+            shelfTagPath = shelfTagUri?.toString(),
+            frontImagePath = frontImageUri?.toString(),
+            backImagePath = backImageUri?.toString()
         )
 
         val db = AppDatabase.getDatabase(requireContext())
@@ -174,19 +183,16 @@ class CaptureFragment : Fragment() {
             // Navigate back to ScannerFragment or ProductListFragment
             activity?.runOnUiThread {
                 val action = CaptureFragmentDirections.actionCaptureToScanner()
-                requireActivity().findNavController(R.id.main_container).navigate(action)
+                findNavController().navigate(action)
             }
         }
     }
 
-    private fun updateThumbnail(fileName: String, photoFile: File) {
-        val uri = Uri.fromFile(photoFile)
-
-        // Update the UI with the captured image thumbnail
+    private fun updateThumbnail(fileName: String, photoUri: Uri) {
         when (fileName) {
-            "shelf_tag.jpg" -> binding.shelfTagThumbnail.setImageURI(uri)
-            "front.jpg" -> binding.frontThumbnail.setImageURI(uri)
-            "back.jpg" -> binding.backThumbnail.setImageURI(uri)
+            "shelf_tag.jpg" -> binding.shelfTagThumbnail.setImageURI(photoUri)
+            "front.jpg" -> binding.frontThumbnail.setImageURI(photoUri)
+            "back.jpg" -> binding.backThumbnail.setImageURI(photoUri)
         }
     }
 

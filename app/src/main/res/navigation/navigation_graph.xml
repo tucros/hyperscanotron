@@ -13,6 +13,11 @@
     </fragment>
 
     <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.hyperscan_o_tron.ui.SettingsFragment"
+        android:label="Settings" />
+
+    <fragment
         android:id="@+id/scannerFragment"
         android:name="com.example.hyperscan_o_tron.ui.ScannerFragment"
         android:label="Scanner">
@@ -29,7 +34,7 @@
             android:name="upcCode"
             app:argType="string" />
         <action
-            android:id="@+id/actionCaptureToScanner"
+            android:id="@+id/action_capture_to_scanner"
             app:destination="@id/scannerFragment" />
     </fragment>
 

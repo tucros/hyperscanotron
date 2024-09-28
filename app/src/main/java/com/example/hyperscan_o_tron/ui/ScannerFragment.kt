@@ -14,8 +14,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
-import com.example.hyperscan_o_tron.R
+import androidx.navigation.fragment.findNavController
 import com.example.hyperscan_o_tron.databinding.FragmentScannerBinding
 import com.example.hyperscan_o_tron.utils.BarcodeAnalyzer
 import java.util.concurrent.ExecutorService
@@ -103,7 +102,7 @@ class ScannerFragment : Fragment() {
         // Handle the scanned barcode value (UPC code)
         // Navigate to the CaptureFragment to capture images
         val action = ScannerFragmentDirections.actionScannerToCapture(barcodeValue)
-        requireActivity().findNavController(R.id.main_container).navigate(action)
+        findNavController().navigate(action)
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

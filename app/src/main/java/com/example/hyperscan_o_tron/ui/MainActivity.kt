@@ -2,7 +2,6 @@ package com.example.hyperscan_o_tron.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.fragment.NavHostFragment
 import com.example.hyperscan_o_tron.R
 
 
@@ -12,4 +11,5 @@ class MainActivity : AppCompatActivity() {
         // Set the content view to the activity layout
         setContentView(R.layout.activity_main)
     }
+
 }
