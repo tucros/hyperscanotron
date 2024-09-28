@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:startDestination="@id/scannerFragment">
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.hyperscan_o_tron.ui.MainFragment"
+        android:label="MainFragment">
+        <action
+            android:id="@+id/action_main_to_scanner"
+            app:destination="@id/scannerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/scannerFragment"
@@ -10,9 +19,6 @@
         <action
             android:id="@+id/action_scanner_to_capture"
             app:destination="@id/captureFragment" />
-        <argument
-            android:name="upcCode"
-            app:argType="string" />
     </fragment>
 
     <fragment
@@ -22,6 +28,9 @@
         <argument
             android:name="upcCode"
             app:argType="string" />
+        <action
+            android:id="@+id/actionCaptureToScanner"
+            app:destination="@id/scannerFragment" />
     </fragment>
 
 </navigation>

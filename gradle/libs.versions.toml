@@ -1,6 +1,6 @@
 [versions]
 agp = "8.6.1"
-kotlin = "1.9.21"
+kotlin = "1.9.25"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -11,13 +11,13 @@ composeBom = "2024.09.02"
 
 camerax = "1.3.4"
 mlkit-barcode-scanning = "17.3.0"
-roomRuntime = "2.5.0"
+roomRuntime = "2.6.1"
 zelory-compressor = "3.0.1"
 kotlinx-coroutines = "1.7.3"
 androidx-navigation = "2.8.1"
 cameraView = "1.3.4"
 safeargs = "2.8.1"
-ksp = "1.9.21-1.0.15"
+ksp = "1.9.25-1.0.20"
 
 
 [libraries]

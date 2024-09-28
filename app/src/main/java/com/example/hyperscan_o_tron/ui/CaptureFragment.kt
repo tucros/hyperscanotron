@@ -5,14 +5,21 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import androidx.camera.core.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import com.example.hyperscan_o_tron.R
 import com.example.hyperscan_o_tron.data.AppDatabase
 import com.example.hyperscan_o_tron.data.Product
 import com.example.hyperscan_o_tron.databinding.FragmentCaptureBinding
@@ -67,7 +74,6 @@ class CaptureFragment : Fragment() {
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        // Set click listeners for capture buttons
         binding.captureShelfTagButton.setOnClickListener {
             takePhoto("shelf_tag.jpg")
         }

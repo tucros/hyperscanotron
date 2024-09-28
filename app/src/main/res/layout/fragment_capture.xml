@@ -24,45 +24,48 @@
             android:id="@+id/captureShelfTagButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Capture Shelf Tag" />
+            android:text="@string/capture_shelf_tag" />
 
         <ImageView
             android:id="@+id/shelfTagThumbnail"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/shelf_tag_thumbnail" />
 
         <Button
             android:id="@+id/captureFrontButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Capture Front Image"
+            android:text="@string/capture_front_image"
             android:layout_marginTop="16dp" />
 
         <ImageView
             android:id="@+id/frontThumbnail"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/front_image_thumbnail" />
 
         <Button
             android:id="@+id/captureBackButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Capture Back Image (Optional)"
+            android:text="@string/capture_back_image_optional"
             android:layout_marginTop="16dp" />
 
         <ImageView
             android:id="@+id/backThumbnail"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/back_image_thumbnail" />
 
         <Button
             android:id="@+id/finishButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Finish"
+            android:text="@string/finish"
             android:layout_marginTop="16dp" />
     </LinearLayout>
 

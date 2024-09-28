@@ -5,4 +5,13 @@
     <string name="timestamp">Timestamp</string>
     <string name="upc_code">UPC Code</string>
     <string name="product_thumbnail">Product Thumbnail</string>
+    <string name="capture_upc">Capture UPC</string>
+    <string name="capture_shelf_tag">Capture Shelf Tag</string>
+    <string name="capture_front_image">Capture Front Image</string>
+    <string name="capture_back_image_optional">Capture Back Image (Optional)</string>
+    <string name="finish">Finish</string>
+    <string name="front_image_thumbnail">Front Image Thumbnail</string>
+    <string name="back_image_thumbnail">Back Image Thumbnail</string>
+    <string name="shelf_tag_thumbnail">Shelf Tag Thumbnail</string>
+    <string name="start_scanning">Start Scanning</string>
 </resources>
