@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/scannerFragment">
+
+    <fragment
+        android:id="@+id/scannerFragment"
+        android:name="com.example.hyperscan_o_tron.ui.ScannerFragment"
+        android:label="Scanner">
+        <action
+            android:id="@+id/action_scanner_to_capture"
+            app:destination="@id/captureFragment" />
+        <argument
+            android:name="upcCode"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/captureFragment"
+        android:name="com.example.hyperscan_o_tron.ui.CaptureFragment"
+        android:label="Capture">
+        <argument
+            android:name="upcCode"
+            app:argType="string" />
+    </fragment>
+
+</navigation>
