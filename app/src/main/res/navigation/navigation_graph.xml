@@ -27,7 +27,7 @@
         tools:layout="@layout/fragment_new_scan">
         <action
             android:id="@+id/action_newScan_to_scanDetails"
-            app:destination="@id/scanDetailsFragment"></action>
+            app:destination="@id/scanDetailsFragment" />
     </fragment>
 
     <!-- ScanDetailsFragment -->
@@ -41,7 +41,10 @@
             app:argType="long" />
         <action
             android:id="@+id/action_scanDetails_to_scanner"
-            app:destination="@id/scannerFragment"></action>
+            app:destination="@id/scannerFragment" />
+        <action
+            android:id="@+id/action_scanDetails_to_productDetails"
+            app:destination="@id/productDetailsFragment" />
     </fragment>
 
     <fragment
@@ -78,6 +81,16 @@
         <action
             android:id="@+id/action_capture_to_scanner"
             app:destination="@id/scannerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/productDetailsFragment"
+        android:name="com.example.hyperscan_o_tron.ui.ProductDetailsFragment"
+        android:label="Product Details"
+        tools:layout="@layout/fragment_product_details">
+        <argument
+            android:name="upcCode"
+            app:argType="string" />
     </fragment>
 
 </navigation>

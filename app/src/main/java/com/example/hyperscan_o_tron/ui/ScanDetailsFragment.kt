@@ -73,7 +73,11 @@ class ScanDetailsFragment : Fragment() {
     // Load the products associated with the scan
     private fun loadProductsForScan(scanId: Long) {
         mainViewModel.getProductsForScan(scanId).observe(viewLifecycleOwner, Observer { products ->
-            binding.productRecyclerView.adapter = ProductAdapter(products)
+            binding.productRecyclerView.adapter = ProductAdapter(products) { product ->
+                findNavController().navigate(
+                    ScanDetailsFragmentDirections.actionScanDetailsToProductDetails(product.upcCode)
+                )
+            }
         })
     }
 

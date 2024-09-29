@@ -6,6 +6,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface ProductDao {
@@ -17,6 +18,12 @@ interface ProductDao {
 
     @Query("SELECT * FROM products WHERE scanId = :scanId ORDER BY timestamp DESC")
     fun getProductsByScanId(scanId: Long): LiveData<List<Product>>
+
+    @Query("SELECT * FROM products WHERE id = :productId")
+    fun getProductById(productId: Long): LiveData<Product?>
+
+    @Update
+    suspend fun updateProduct(product: Product)
 
     @Delete
     suspend fun deleteProduct(product: Product)

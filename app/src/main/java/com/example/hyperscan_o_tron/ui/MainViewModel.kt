@@ -47,4 +47,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    fun getProductById(productId: Long): LiveData<Product?> {
+        return productDao.getProductById(productId)
+    }
+
+    // Update product details (e.g., after retaking an image)
+    fun updateProduct(product: Product) {
+        viewModelScope.launch {
+            productDao.updateProduct(product)
+        }
+    }
 }

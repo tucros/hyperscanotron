@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- UPC Display -->
+    <TextView
+        android:id="@+id/upcTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="UPC: 123456789"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Front Image Thumbnail -->
+    <ImageView
+        android:id="@+id/frontImageThumbnail"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="Front Image"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upcTextView" />
+
+    <!-- Retake Front Image Button -->
+    <Button
+        android:id="@+id/retakeFrontImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Retake Front Image"
+        app:layout_constraintStart_toStartOf="@id/frontImageThumbnail"
+        app:layout_constraintTop_toBottomOf="@id/frontImageThumbnail" />
+
+    <!-- Shelf-Tag Image Thumbnail -->
+    <ImageView
+        android:id="@+id/shelfTagImageThumbnail"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="Shelf-Tag Image"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toEndOf="@id/frontImageThumbnail"
+        app:layout_constraintTop_toTopOf="@id/frontImageThumbnail" />
+
+    <!-- Retake Shelf-Tag Image Button -->
+    <Button
+        android:id="@+id/retakeShelfTagImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Retake Shelf-Tag Image"
+        app:layout_constraintStart_toStartOf="@id/shelfTagImageThumbnail"
+        app:layout_constraintTop_toBottomOf="@id/shelfTagImageThumbnail" />
+
+    <!-- Back Image Thumbnail (optional) -->
+    <ImageView
+        android:id="@+id/backImageThumbnail"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="Back Image"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/shelfTagImageThumbnail"
+        app:layout_constraintTop_toTopOf="@id/frontImageThumbnail" /> <!-- Initially hidden if no back image -->
+
+    <!-- Retake Back Image Button -->
+    <Button
+        android:id="@+id/retakeBackImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Retake Back Image"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/backImageThumbnail"
+        app:layout_constraintTop_toBottomOf="@id/backImageThumbnail" /> <!-- Initially hidden if no back image -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
