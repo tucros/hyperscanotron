@@ -2,60 +2,55 @@ package com.example.hyperscan_o_tron.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.example.hyperscan_o_tron.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.hyperscan_o_tron.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_main, container, false)
-
-        // Get reference to the start scanning button
-        val startScanningButton = view.findViewById<Button>(R.id.start_scanning_button)
-
-        // Set click listener for the button to navigate to ScannerFragment
-        startScanningButton.setOnClickListener {
-            findNavController().navigate(R.id.action_main_to_scanner)
-        }
-
-        return view
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Existing code...
+        super.onViewCreated(view, savedInstanceState)
 
-        // Set up MenuProvider
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Inflate the menu; add items to the action bar if it is present.
-                menuInflater.inflate(R.menu.main_menu, menu)
-            }
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.action_settings -> {
-                        findNavController().navigate(R.id.settingsFragment)
-                        true
-                    }
-
-                    else -> false
+        mainViewModel.allScans.observe(viewLifecycleOwner, Observer { scans ->
+            if (scans.isNullOrEmpty()) {
+                binding.emptyMessage.visibility = View.VISIBLE
+                binding.recyclerView.visibility = View.GONE
+            } else {
+                binding.emptyMessage.visibility = View.GONE
+                binding.recyclerView.visibility = View.VISIBLE
+                binding.recyclerView.adapter = ScanAdapter(scans) { scan ->
+                    findNavController().navigate(MainFragmentDirections.actionMainToScanDetails(scan.id))
                 }
             }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        })
+
+        // Floating Action Button to add a new scan
+        binding.addScanFab.setOnClickListener {
+            findNavController().navigate(MainFragmentDirections.actionMainToNewScan())
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null // Avoid memory leaks
     }
 }

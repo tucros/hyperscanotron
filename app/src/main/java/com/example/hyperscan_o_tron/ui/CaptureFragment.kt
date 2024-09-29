@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -36,6 +37,7 @@ class CaptureFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
 
     private lateinit var upcCode: String
+    private var scanId: Long = 0
 
     companion object {
         private const val TAG = "CaptureFragment"
@@ -47,6 +49,7 @@ class CaptureFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             upcCode = CaptureFragmentArgs.fromBundle(it).upcCode
+            scanId = CaptureFragmentArgs.fromBundle(it).scanId
         }
     }
 
@@ -59,7 +62,6 @@ class CaptureFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -170,6 +172,7 @@ class CaptureFragment : Fragment() {
 
         val product = Product(
             upcCode = upcCode,
+            scanId = scanId, //TODO: Replace with actual scanId
             timestamp = System.currentTimeMillis(),
             shelfTagPath = shelfTagUri?.toString(),
             frontImagePath = frontImageUri?.toString(),
@@ -180,9 +183,9 @@ class CaptureFragment : Fragment() {
 
         lifecycleScope.launch {
             db.productDao().insertProduct(product)
-            // Navigate back to ScannerFragment or ProductListFragment
+            Toast.makeText(requireContext(), "Product saved", Toast.LENGTH_SHORT).show()
             activity?.runOnUiThread {
-                val action = CaptureFragmentDirections.actionCaptureToScanner()
+                val action = CaptureFragmentDirections.actionCaptureToScanner(scanId)
                 findNavController().navigate(action)
             }
         }

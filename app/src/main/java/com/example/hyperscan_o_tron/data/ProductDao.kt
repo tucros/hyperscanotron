@@ -15,6 +15,9 @@ interface ProductDao {
     @Query("SELECT * FROM products ORDER BY timestamp DESC")
     fun getAllProducts(): LiveData<List<Product>>
 
+    @Query("SELECT * FROM products WHERE scanId = :scanId ORDER BY timestamp DESC")
+    fun getProductsByScanId(scanId: Long): LiveData<List<Product>>
+
     @Delete
     suspend fun deleteProduct(product: Product)
 }

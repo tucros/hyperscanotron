@@ -17,4 +17,19 @@
     <string name="settings">Settings</string>
     <string name="current_storage_path">Current Storage Path:</string>
     <string name="change_storage_location">Change Storage Location</string>
+    <string name="new_scan">New Scan</string>
+    <string name="no_scans_available_press_to_create_a_new_scan">No scans available. Press + to create a new scan.</string>
+    <string name="scan_created">Created: %1$s</string>
+    <string name="scan_modified">Modified: %1$s</string>
+    <string name="scan_products">Products: 0</string>
+    <string name="scan_name">Scan Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="start">Start</string>
+    <string name="enter_scan_name">Enter scan name</string>
+    <string name="created_date_modified_date">Created: Date • Modified: Date</string>
+    <string name="add_product">Add Product</string>
+    <string name="delete_scan">Delete Scan</string>
+    <string name="upc">UPC</string>
+    <string name="product_image_thumbnail">Product Image Thumbnail</string>
+    <string name="looking_for_a_barcode">Looking for a barcode...</string>
 </resources>

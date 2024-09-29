@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "products")
 data class Product(
     @PrimaryKey val upcCode: String,
+    val scanId: Long,
     val timestamp: Long,
     val shelfTagPath: String?,
     val frontImagePath: String?,

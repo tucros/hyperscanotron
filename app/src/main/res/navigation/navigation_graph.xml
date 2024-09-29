@@ -1,15 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/mainFragment">
 
+    <!-- MainFragment -->
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.hyperscan_o_tron.ui.MainFragment"
-        android:label="MainFragment">
+        android:label="MainFragment"
+        tools:layout="@layout/fragment_main">
+
         <action
-            android:id="@+id/action_main_to_scanner"
-            app:destination="@id/scannerFragment" />
+            android:id="@+id/action_main_to_newScan"
+            app:destination="@id/newScanFragment" />
+        <action
+            android:id="@+id/action_main_to_scanDetails"
+            app:destination="@id/scanDetailsFragment" />
+    </fragment>
+
+    <!-- NewScanFragment -->
+    <fragment
+        android:id="@+id/newScanFragment"
+        android:name="com.example.hyperscan_o_tron.ui.NewScanFragment"
+        android:label="New Scan"
+        tools:layout="@layout/fragment_new_scan">
+        <action
+            android:id="@+id/action_newScan_to_scanDetails"
+            app:destination="@id/scanDetailsFragment"></action>
+    </fragment>
+
+    <!-- ScanDetailsFragment -->
+    <fragment
+        android:id="@+id/scanDetailsFragment"
+        android:name="com.example.hyperscan_o_tron.ui.ScanDetailsFragment"
+        android:label="Scan Details"
+        tools:layout="@layout/fragment_scan_details">
+        <argument
+            android:name="scanId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_scanDetails_to_scanner"
+            app:destination="@id/scannerFragment"></action>
     </fragment>
 
     <fragment
@@ -21,15 +53,25 @@
         android:id="@+id/scannerFragment"
         android:name="com.example.hyperscan_o_tron.ui.ScannerFragment"
         android:label="Scanner">
+        <argument
+            android:name="scanId"
+            app:argType="long" />
         <action
             android:id="@+id/action_scanner_to_capture"
             app:destination="@id/captureFragment" />
+        <action
+            android:id="@+id/action_scanner_to_scanDetails"
+            app:destination="@id/scanDetailsFragment" />
+
     </fragment>
 
     <fragment
         android:id="@+id/captureFragment"
         android:name="com.example.hyperscan_o_tron.ui.CaptureFragment"
         android:label="Capture">
+        <argument
+            android:name="scanId"
+            app:argType="long" />
         <argument
             android:name="upcCode"
             app:argType="string" />

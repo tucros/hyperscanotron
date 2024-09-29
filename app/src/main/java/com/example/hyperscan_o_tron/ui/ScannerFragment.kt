@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.hyperscan_o_tron.databinding.FragmentScannerBinding
 import com.example.hyperscan_o_tron.utils.BarcodeAnalyzer
 import java.util.concurrent.ExecutorService
@@ -32,6 +33,8 @@ class ScannerFragment : Fragment() {
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
+
+    private val args: ScannerFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,6 +55,11 @@ class ScannerFragment : Fragment() {
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        binding.cancelButton.setOnClickListener {
+            val action = ScannerFragmentDirections.actionScannerToScanDetails(args.scanId)
+            findNavController().navigate(action)
+        }
     }
 
     private fun startCamera() {
@@ -99,9 +107,7 @@ class ScannerFragment : Fragment() {
     }
 
     private fun onBarcodeScanned(barcodeValue: String) {
-        // Handle the scanned barcode value (UPC code)
-        // Navigate to the CaptureFragment to capture images
-        val action = ScannerFragmentDirections.actionScannerToCapture(barcodeValue)
+        val action = ScannerFragmentDirections.actionScannerToCapture(args.scanId, barcodeValue)
         findNavController().navigate(action)
     }
 

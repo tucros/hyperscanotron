@@ -11,6 +11,17 @@ object FileUtils {
     private const val PREFS_NAME = "app_prefs"
     private const val KEY_STORAGE_URI = "storage_uri"
 
+    fun createFolder(context: Context, folderName: String): File? {
+        val rootDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: return null
+        val scanFolder = File(rootDir, folderName)
+
+        return if (scanFolder.exists() || scanFolder.mkdirs()) {
+            scanFolder
+        } else {
+            null
+        }
+    }
+
     /**
      * Creates a file in the user-selected storage location or default app-specific storage.
      */
