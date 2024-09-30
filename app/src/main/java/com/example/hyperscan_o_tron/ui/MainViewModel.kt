@@ -48,6 +48,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return scanDao.getScanByIdSync(scanId)
     }
 
+    fun insertProduct(product: Product) {
+        viewModelScope.launch {
+            productDao.insertProduct(product)
+        }
+    }
+
     // Get products for a specific scan
     fun getProductsForScan(scanId: Long): LiveData<List<Product>> {
         return productDao.getProductsByScanId(scanId)

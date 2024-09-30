@@ -1,12 +1,15 @@
 package com.example.hyperscan_o_tron.ui
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.hyperscan_o_tron.data.Product
 import com.example.hyperscan_o_tron.databinding.FragmentProductDetailsBinding
 
@@ -28,9 +31,7 @@ class ProductDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         val upcCode = arguments?.getString("upcCode")
-
         if (upcCode != null) {
             mainViewModel.getProductByUpcCode(upcCode).observe(viewLifecycleOwner) { product ->
                 if (product != null) {
@@ -46,16 +47,16 @@ class ProductDetailsFragment : Fragment() {
         binding.upcTextView.text = "UPC: ${product.upcCode}"
 
         // Load the front image thumbnail
-//        loadImageIntoView(product.frontImagePath, binding.frontImageThumbnail)
+        loadImageIntoView(product.frontImageUri, binding.frontImageThumbnail)
 
         // Load the shelf-tag image thumbnail
-//        loadImageIntoView(product.shelfTagPath, binding.shelfTagImageThumbnail)
+        loadImageIntoView(product.shelfTagUri, binding.shelfTagImageThumbnail)
 
         // Load the back image thumbnail (if it exists)
         if (product.backImageUri != null) {
             binding.backImageThumbnail.visibility = View.VISIBLE
             binding.retakeBackImageButton.visibility = View.VISIBLE
-//            loadImageIntoView(product.backImagePath, binding.backImageThumbnail)
+            loadImageIntoView(product.backImageUri, binding.backImageThumbnail)
         } else {
             binding.backImageThumbnail.visibility = View.GONE
             binding.retakeBackImageButton.visibility = View.GONE
@@ -91,17 +92,18 @@ class ProductDetailsFragment : Fragment() {
         }
     }
 
-//    private fun loadImageIntoView(imagePath: String?, imageView: ImageView) {
-//        // Load the image using a utility function (e.g., using Glide or Picasso)
-//        if (imagePath != null) {
-//            Glide.with(this).load(imagePath).into(imageView)
-//        }
-//    }
+    private fun loadImageIntoView(imagePath: String?, imageView: ImageView) {
+        Uri.parse(imagePath)?.let {
+            imageView.setImageURI(it)
+        }
+    }
 
     private fun showFullSizeImage(imagePath: String?) {
         if (imagePath != null) {
-            // Implement full-size image view (e.g., navigate to another fragment or open a dialog)
-            Toast.makeText(requireContext(), "Showing full-size image", Toast.LENGTH_SHORT).show()
+            val action = ProductDetailsFragmentDirections.actionProductDetailsToFullImage(imagePath)
+            findNavController().navigate(action)
+        } else {
+            Toast.makeText(requireContext(), "No image to show", Toast.LENGTH_SHORT).show()
         }
     }
 

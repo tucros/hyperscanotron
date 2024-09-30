@@ -10,18 +10,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.hyperscan_o_tron.data.AppDatabase
 import com.example.hyperscan_o_tron.data.Product
 import com.example.hyperscan_o_tron.data.Scan
 import com.example.hyperscan_o_tron.databinding.FragmentCaptureBinding
@@ -50,6 +49,18 @@ class CaptureFragment : Fragment() {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission is granted, start the camera
+                startCamera()
+            } else {
+                // Permission is denied, show a message to the user
+                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -77,13 +88,15 @@ class CaptureFragment : Fragment() {
             }
         }
 
-        if (allPermissionsGranted()) {
-            startCamera()
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            startCamera() // Start camera directly if permission is granted
         } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
+            // Request permission using the new API
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
+
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
@@ -187,15 +200,10 @@ class CaptureFragment : Fragment() {
     }
 
     private fun saveProductData() {
-        val db = AppDatabase.getDatabase(requireContext())
-
         lifecycleScope.launch {
-            db.productDao().insertProduct(product)
+            mainViewModel.insertProduct(product)
             Toast.makeText(requireContext(), "Product saved", Toast.LENGTH_SHORT).show()
-            activity?.runOnUiThread {
-                val action = CaptureFragmentDirections.actionCaptureToScanner(scanId)
-                findNavController().navigate(action)
-            }
+            findNavController().popBackStack()
         }
     }
 
@@ -204,25 +212,6 @@ class CaptureFragment : Fragment() {
             "shelf_tag.jpg" -> binding.shelfTagThumbnail.setImageURI(photoUri)
             "front.jpg" -> binding.frontThumbnail.setImageURI(photoUri)
             "back.jpg" -> binding.backThumbnail.setImageURI(photoUri)
-        }
-    }
-
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            requireContext(), it
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                // Permission not granted
-            }
         }
     }
 

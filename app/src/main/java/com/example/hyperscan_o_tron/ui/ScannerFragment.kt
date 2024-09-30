@@ -7,15 +7,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.hyperscan_o_tron.R
 import com.example.hyperscan_o_tron.databinding.FragmentScannerBinding
 import com.example.hyperscan_o_tron.utils.BarcodeAnalyzer
 import java.util.concurrent.ExecutorService
@@ -34,6 +36,16 @@ class ScannerFragment : Fragment() {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                startCamera()
+            } else {
+                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+
     private val args: ScannerFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -45,13 +57,13 @@ class ScannerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Request camera permissions
-        if (allPermissionsGranted()) {
-            startCamera()
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            startCamera() // Start camera directly if permission is granted
         } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
+            // Request permission using the new API
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -107,26 +119,12 @@ class ScannerFragment : Fragment() {
     }
 
     private fun onBarcodeScanned(barcodeValue: String) {
-        val action = ScannerFragmentDirections.actionScannerToCapture(args.scanId, barcodeValue)
-        findNavController().navigate(action)
-    }
-
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            requireContext(), it
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                // Permission not granted. Show a message and close the app or handle accordingly.
-            }
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.scannerFragment) {
+            val action = ScannerFragmentDirections.actionScannerToCapture(args.scanId, barcodeValue)
+            navController.navigate(action)
+        } else {
+            Log.e(TAG, "Navigation failed: current destination is not ScannerFragment")
         }
     }
 

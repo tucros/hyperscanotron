@@ -92,6 +92,18 @@
         <argument
             android:name="upcCode"
             app:argType="string" />
+        <action
+            android:id="@+id/action_productDetails_to_fullImage"
+            app:destination="@id/fullImageFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/fullImageFragment"
+        android:name="com.example.hyperscan_o_tron.ui.FullImageFragment"
+        android:label="Full Image"
+        tools:layout="@layout/fragment_full_image">
+        <argument
+            android:name="imagePath"
+            app:argType="string" />
+    </fragment>
 </navigation>
