@@ -11,5 +11,5 @@ data class Scan(
     val name: String,
     val createdAt: Date,
     val modifiedAt: Date,
-    val folderPath: String
+    var folderPath: String?
 )

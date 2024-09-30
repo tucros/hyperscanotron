@@ -24,4 +24,7 @@ interface ScanDao {
 
     @Query("SELECT * FROM scans WHERE id = :scanId")
     fun getScanById(scanId: Long): LiveData<Scan>
+
+    @Query("SELECT * FROM scans WHERE id = :scanId")
+    suspend fun getScanByIdSync(scanId: Long): Scan?
 }

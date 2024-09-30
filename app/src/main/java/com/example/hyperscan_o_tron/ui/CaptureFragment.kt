@@ -1,6 +1,7 @@
 package com.example.hyperscan_o_tron.ui
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -17,10 +18,12 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.hyperscan_o_tron.data.AppDatabase
 import com.example.hyperscan_o_tron.data.Product
+import com.example.hyperscan_o_tron.data.Scan
 import com.example.hyperscan_o_tron.databinding.FragmentCaptureBinding
 import com.example.hyperscan_o_tron.utils.FileUtils
 import kotlinx.coroutines.launch
@@ -33,11 +36,13 @@ class CaptureFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var imageCapture: ImageCapture
-
     private lateinit var cameraExecutor: ExecutorService
+
+    private val mainViewModel: MainViewModel by viewModels()
 
     private lateinit var upcCode: String
     private var scanId: Long = 0
+    private lateinit var product: Product
 
     companion object {
         private const val TAG = "CaptureFragment"
@@ -48,8 +53,9 @@ class CaptureFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            upcCode = CaptureFragmentArgs.fromBundle(it).upcCode
-            scanId = CaptureFragmentArgs.fromBundle(it).scanId
+            val args = CaptureFragmentArgs.fromBundle(it)
+            scanId = args.scanId
+            upcCode = args.upcCode
         }
     }
 
@@ -62,6 +68,15 @@ class CaptureFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        lifecycleScope.launch {
+            val scan = mainViewModel.getScanByIdSync(scanId)
+            if (scan != null) {
+                setupCapture(scan)
+            } else {
+                Log.e(ContentValues.TAG, "Scan not found with ID: $scanId")
+            }
+        }
+
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -69,26 +84,42 @@ class CaptureFragment : Fragment() {
                 requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun setupCapture(scan: Scan) {
+        product = Product(
+            upcCode = upcCode,
+            scanId = scanId,
+            timestamp = System.currentTimeMillis(),
+            shelfTagUri = null,
+            frontImageUri = null,
+            backImageUri = null
+        )
 
         binding.captureShelfTagButton.setOnClickListener {
-            takePhoto("shelf_tag.jpg")
+            takePhoto(scan, "shelf_tag.jpg") { uri ->
+                product.shelfTagUri = uri.toString()
+                Log.d(TAG, "Shelf-tag image saved at: $uri")
+            }
         }
 
         binding.captureFrontButton.setOnClickListener {
-            takePhoto("front.jpg")
+            takePhoto(scan, "front.jpg") { uri ->
+                product.frontImageUri = uri.toString()
+                Log.d(TAG, "Front image saved at: $uri")
+            }
         }
 
         binding.captureBackButton.setOnClickListener {
-            takePhoto("back.jpg")
+            takePhoto(scan, "back.jpg") { uri ->
+                product.backImageUri = uri.toString()
+                Log.d(TAG, "Back image saved at: $uri")
+            }
         }
 
         binding.finishButton.setOnClickListener {
-            // Save product data to the database
             saveProductData()
-            // Navigate back to the scanner or product list
-
         }
     }
 
@@ -123,24 +154,18 @@ class CaptureFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    private fun takePhoto(fileName: String) {
-        // Create output directory and file
-        val photoUri = FileUtils.createFile(requireContext(), upcCode, fileName)
+    private fun takePhoto(scan: Scan, fileName: String, onImageSaved: (Uri) -> Unit) {
+        val scanFolder = FileUtils.createScanFolder(requireContext(), scan.id) ?: return
+        val photoUri = FileUtils.createImageFile(requireContext(), scanFolder, upcCode, fileName)
 
         if (photoUri == null) {
             Log.e(TAG, "Failed to create file URI")
             return
         }
 
-        // Open an OutputStream from the Uri
-        val outputStream = requireContext().contentResolver.openOutputStream(photoUri)
-        if (outputStream == null) {
-            Log.e(TAG, "Failed to open output stream for Uri: $photoUri")
-            return
-        }
-
-        // Use File-based OutputFileOptions instead of ContentResolver-based
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(outputStream).build()
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(
+            requireContext().contentResolver.openOutputStream(photoUri)!!
+        ).build()
 
         // Take the picture
         imageCapture.takePicture(
@@ -148,12 +173,8 @@ class CaptureFragment : Fragment() {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     lifecycleScope.launch {
-                        // Optionally compress the image after capture
-                        // ImageUtils.compressImage(requireContext(), Uri.fromFile(photoFile))
-
-                        // Update UI with thumbnail or confirmation
                         updateThumbnail(fileName, photoUri)
-
+                        onImageSaved(photoUri)
                         Log.d(TAG, "Photo saved: $photoUri")
                     }
                 }
@@ -166,19 +187,6 @@ class CaptureFragment : Fragment() {
     }
 
     private fun saveProductData() {
-        val shelfTagUri = FileUtils.getFilePath(requireContext(), upcCode, "shelf_tag.jpg")
-        val frontImageUri = FileUtils.getFilePath(requireContext(), upcCode, "front.jpg")
-        val backImageUri = FileUtils.getFilePath(requireContext(), upcCode, "back.jpg")
-
-        val product = Product(
-            upcCode = upcCode,
-            scanId = scanId, //TODO: Replace with actual scanId
-            timestamp = System.currentTimeMillis(),
-            shelfTagPath = shelfTagUri?.toString(),
-            frontImagePath = frontImageUri?.toString(),
-            backImagePath = backImageUri?.toString()
-        )
-
         val db = AppDatabase.getDatabase(requireContext())
 
         lifecycleScope.launch {

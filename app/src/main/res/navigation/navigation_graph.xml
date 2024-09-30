@@ -55,7 +55,8 @@
     <fragment
         android:id="@+id/scannerFragment"
         android:name="com.example.hyperscan_o_tron.ui.ScannerFragment"
-        android:label="Scanner">
+        android:label="Scanner"
+        tools:layout="@layout/fragment_scanner">
         <argument
             android:name="scanId"
             app:argType="long" />
@@ -65,13 +66,13 @@
         <action
             android:id="@+id/action_scanner_to_scanDetails"
             app:destination="@id/scanDetailsFragment" />
-
     </fragment>
 
     <fragment
         android:id="@+id/captureFragment"
         android:name="com.example.hyperscan_o_tron.ui.CaptureFragment"
-        android:label="Capture">
+        android:label="Capture"
+        tools:layout="@layout/fragment_capture">
         <argument
             android:name="scanId"
             app:argType="long" />

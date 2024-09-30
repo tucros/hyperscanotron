@@ -1,6 +1,8 @@
 package com.example.hyperscan_o_tron.ui
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,11 +10,13 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hyperscan_o_tron.data.Scan
 import com.example.hyperscan_o_tron.databinding.FragmentScanDetailsBinding
+import kotlinx.coroutines.launch
 
 class ScanDetailsFragment : Fragment() {
 
@@ -34,16 +38,19 @@ class ScanDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get the scanId from the arguments
         val scanId = args.scanId
 
-        // Observe the scan and update the UI
-        mainViewModel.getScanById(scanId).observe(viewLifecycleOwner, Observer { scan ->
+        lifecycleScope.launch {
+            val scan = mainViewModel.getScanByIdSync(scanId)
             if (scan != null) {
+                //log scan id, name, folder
+                Log.d(TAG, "Scan ID: $scanId, Name: ${scan.name}, Folder: ${scan.folderPath}")
                 displayScanDetails(scan)
                 loadProductsForScan(scan.id)
+            } else {
+                Log.e(TAG, "Scan not found with ID: $scanId")
             }
-        })
+        }
 
         // Set up RecyclerView for products
         binding.productRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -65,9 +72,8 @@ class ScanDetailsFragment : Fragment() {
     // Display scan details in the UI
     private fun displayScanDetails(scan: Scan) {
         binding.scanNameTextView.text = scan.name
-        val createdDate = scan.createdAt.toString() // Format as needed
-        val modifiedDate = scan.modifiedAt.toString()
-        binding.scanDatesTextView.text = "Created: $createdDate • Modified: $modifiedDate"
+        val createdDate = scan.createdAt.toString()
+        binding.scanDatesTextView.text = "Created: $createdDate"
     }
 
     // Load the products associated with the scan

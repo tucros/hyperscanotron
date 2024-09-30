@@ -17,9 +17,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val allScans: LiveData<List<Scan>> = scanDao.getAllScans()
 
 
-    fun createScan(scan: Scan) {
+    fun createScan(scan: Scan, onScanCreated: (Long) -> Unit) {
         viewModelScope.launch {
-            scanDao.insertScan(scan)
+            val scanId = scanDao.insertScan(scan)
+            onScanCreated(scanId)
+        }
+    }
+
+    fun updateScanFolder(scanId: Long, folderPath: String) {
+        viewModelScope.launch {
+            val scan = scanDao.getScanByIdSync(scanId)
+            if (scan != null) {
+                scan.folderPath = folderPath
+                scanDao.updateScan(scan)
+            }
         }
     }
 
@@ -31,6 +42,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getScanById(scanId: Long): LiveData<Scan> {
         return scanDao.getScanById(scanId)
+    }
+
+    suspend fun getScanByIdSync(scanId: Long): Scan? {
+        return scanDao.getScanByIdSync(scanId)
     }
 
     // Get products for a specific scan
@@ -48,8 +63,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getProductById(productId: Long): LiveData<Product?> {
-        return productDao.getProductById(productId)
+    fun getProductByUpcCode(upcCode: String): LiveData<Product?> {
+        return productDao.getProductByUpcCode(upcCode)
     }
 
     // Update product details (e.g., after retaking an image)

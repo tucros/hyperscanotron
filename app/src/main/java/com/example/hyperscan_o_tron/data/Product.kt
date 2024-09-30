@@ -8,7 +8,7 @@ data class Product(
     @PrimaryKey val upcCode: String,
     val scanId: Long,
     val timestamp: Long,
-    val shelfTagPath: String?,
-    val frontImagePath: String?,
-    val backImagePath: String?
+    var shelfTagUri: String?,
+    var frontImageUri: String?,
+    var backImageUri: String?
 )

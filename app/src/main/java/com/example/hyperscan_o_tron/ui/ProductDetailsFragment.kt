@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.hyperscan_o_tron.data.Product
 import com.example.hyperscan_o_tron.databinding.FragmentProductDetailsBinding
 
@@ -14,7 +15,7 @@ class ProductDetailsFragment : Fragment() {
     private var _binding: FragmentProductDetailsBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var mainViewModel: MainViewModel
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,13 +28,16 @@ class ProductDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val productId = arguments?.getLong("productId") ?: return
 
-        mainViewModel.getProductById(productId).observe(viewLifecycleOwner) { product ->
-            if (product != null) {
-                displayProductDetails(product)
-            } else {
-                Toast.makeText(requireContext(), "Product not found", Toast.LENGTH_SHORT).show()
+        val upcCode = arguments?.getString("upcCode")
+
+        if (upcCode != null) {
+            mainViewModel.getProductByUpcCode(upcCode).observe(viewLifecycleOwner) { product ->
+                if (product != null) {
+                    displayProductDetails(product)
+                } else {
+                    Toast.makeText(requireContext(), "Product not found", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -48,7 +52,7 @@ class ProductDetailsFragment : Fragment() {
 //        loadImageIntoView(product.shelfTagPath, binding.shelfTagImageThumbnail)
 
         // Load the back image thumbnail (if it exists)
-        if (product.backImagePath != null) {
+        if (product.backImageUri != null) {
             binding.backImageThumbnail.visibility = View.VISIBLE
             binding.retakeBackImageButton.visibility = View.VISIBLE
 //            loadImageIntoView(product.backImagePath, binding.backImageThumbnail)
@@ -75,15 +79,15 @@ class ProductDetailsFragment : Fragment() {
 
         // Set up image click listeners for full-size view
         binding.frontImageThumbnail.setOnClickListener {
-            showFullSizeImage(product.frontImagePath)
+            showFullSizeImage(product.frontImageUri)
         }
 
         binding.shelfTagImageThumbnail.setOnClickListener {
-            showFullSizeImage(product.shelfTagPath)
+            showFullSizeImage(product.shelfTagUri)
         }
 
         binding.backImageThumbnail.setOnClickListener {
-            showFullSizeImage(product.backImagePath)
+            showFullSizeImage(product.backImageUri)
         }
     }
 

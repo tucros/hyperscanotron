@@ -50,35 +50,37 @@ class NewScanFragment : Fragment() {
 
     private fun createNewScan(scanName: String) {
         val currentTime = Date()
-        val folderPath = createScanFolder(scanName) // Create folder in external storage
+        val newScan = Scan(
+            name = scanName,
+            createdAt = currentTime,
+            modifiedAt = currentTime,
+            folderPath = null
+        )
 
-        if (folderPath != null) {
-            // Create a new Scan object
-            val newScan = Scan(
-                name = scanName,
-                createdAt = currentTime,
-                modifiedAt = currentTime,
-                folderPath = folderPath
-            )
+        // Insert the scan into the database via ViewModel
+        mainViewModel.createScan(newScan) { scanId ->
+            val scanFolderPath = createScanFolder(scanId)
 
-            // Insert the scan into the database via ViewModel
-            mainViewModel.createScan(newScan)
-            findNavController().navigate(
-                NewScanFragmentDirections.actionNewScanToScanDetails(
-                    newScan.id
+            if (scanFolderPath != null) {
+                mainViewModel.updateScanFolder(scanId, scanFolderPath)
+                findNavController().navigate(
+                    NewScanFragmentDirections.actionNewScanToScanDetails(scanId)
                 )
-            )
-        } else {
-            Toast.makeText(requireContext(), "Error creating folder for scan", Toast.LENGTH_SHORT)
-                .show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Error creating folder for scan",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
         }
     }
 
-    private fun createScanFolder(scanName: String): String? {
-        // Assuming FileUtils has a method to handle folder creation
-        val scanFolder = FileUtils.createFolder(requireContext(), scanName)
+    private fun createScanFolder(scanId: Long): String? {
+        val scanFolder = FileUtils.createScanFolder(requireContext(), scanId)
         return if (scanFolder != null && scanFolder.exists()) {
-            scanFolder.absolutePath
+            scanFolder.absolutePath // Return the folder path
         } else {
             null
         }

@@ -13,14 +13,11 @@ interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProduct(product: Product)
 
-    @Query("SELECT * FROM products ORDER BY timestamp DESC")
-    fun getAllProducts(): LiveData<List<Product>>
-
     @Query("SELECT * FROM products WHERE scanId = :scanId ORDER BY timestamp DESC")
     fun getProductsByScanId(scanId: Long): LiveData<List<Product>>
 
-    @Query("SELECT * FROM products WHERE id = :productId")
-    fun getProductById(productId: Long): LiveData<Product?>
+    @Query("SELECT * FROM products WHERE upcCode = :upcCode LIMIT 1")
+    fun getProductByUpcCode(upcCode: String): LiveData<Product?>
 
     @Update
     suspend fun updateProduct(product: Product)

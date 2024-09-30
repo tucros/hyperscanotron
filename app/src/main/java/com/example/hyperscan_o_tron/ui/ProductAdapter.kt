@@ -1,7 +1,9 @@
 package com.example.hyperscan_o_tron.ui
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hyperscan_o_tron.data.Product
 import com.example.hyperscan_o_tron.databinding.ItemProductBinding
@@ -34,15 +36,16 @@ class ProductAdapter(
                 onProductClick(product) // Trigger the lambda on product click
             }
 
-            // Load image into the ImageView (assuming a method loadImageIntoView exists)
-//            loadImageIntoView(product.frontImagePath, binding.productThumbnailImageView)
+            //log the image path
+            println("Product image path: ${product.frontImageUri}")
+            loadImageIntoView(product.frontImageUri, binding.productThumbnailImageView)
         }
 
-//        private fun loadImageIntoView(imagePath: String?, imageView: ImageView) {
-        // Use Glide, Picasso, or another library to load the image
-//            if (imagePath != null) {
-//                Glide.with(imageView.context).load(imagePath).into(imageView)
-//            }
-//        }
+        private fun loadImageIntoView(imagePath: String?, imageView: ImageView) {
+            imagePath?.let {
+                val imageUri = Uri.parse(imagePath)
+                imageView.setImageURI(imageUri)
+            }
+        }
     }
 }
