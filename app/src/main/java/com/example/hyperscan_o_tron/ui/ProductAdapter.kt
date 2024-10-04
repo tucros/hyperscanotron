@@ -28,17 +28,13 @@ class ProductAdapter(
     class ProductViewHolder(private val binding: ItemProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(product: Product, onProductClick: (Product) -> Unit) {
-            // Bind data to the view
             binding.productNameTextView.text = product.upcCode
 
-            // Set click listener on the root view of the item
             binding.root.setOnClickListener {
-                onProductClick(product) // Trigger the lambda on product click
+                onProductClick(product)
             }
 
-            //log the image path
-            println("Product image path: ${product.frontImageUri}")
-            loadImageIntoView(product.frontImageUri, binding.productThumbnailImageView)
+            loadImageIntoView(product.frontImageThumbnailUri, binding.productThumbnailImageView)
         }
 
         private fun loadImageIntoView(imagePath: String?, imageView: ImageView) {

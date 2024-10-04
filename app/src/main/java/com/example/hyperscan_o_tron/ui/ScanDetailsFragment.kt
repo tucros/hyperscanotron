@@ -44,7 +44,6 @@ class ScanDetailsFragment : Fragment() {
             val scan = mainViewModel.getScanByIdSync(scanId)
             if (scan != null) {
                 //log scan id, name, folder
-                Log.d(TAG, "Scan ID: $scanId, Name: ${scan.name}, Folder: ${scan.folderPath}")
                 displayScanDetails(scan)
                 loadProductsForScan(scan.id)
             } else {

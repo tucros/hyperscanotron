@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.hyperscan_o_tron.data.Scan
 import com.example.hyperscan_o_tron.databinding.FragmentNewScanBinding
-import com.example.hyperscan_o_tron.utils.FileUtils
 import java.util.Date
 
 class NewScanFragment : Fragment() {
@@ -54,35 +53,13 @@ class NewScanFragment : Fragment() {
             name = scanName,
             createdAt = currentTime,
             modifiedAt = currentTime,
-            folderPath = null
         )
 
         // Insert the scan into the database via ViewModel
         mainViewModel.createScan(newScan) { scanId ->
-            val scanFolderPath = createScanFolder(scanId)
-
-            if (scanFolderPath != null) {
-                mainViewModel.updateScanFolder(scanId, scanFolderPath)
-                findNavController().navigate(
-                    NewScanFragmentDirections.actionNewScanToScanDetails(scanId)
-                )
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Error creating folder for scan",
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
-            }
-        }
-    }
-
-    private fun createScanFolder(scanId: Long): String? {
-        val scanFolder = FileUtils.createScanFolder(requireContext(), scanId)
-        return if (scanFolder != null && scanFolder.exists()) {
-            scanFolder.absolutePath // Return the folder path
-        } else {
-            null
+            findNavController().navigate(
+                NewScanFragmentDirections.actionNewScanToScanDetails(scanId)
+            )
         }
     }
 

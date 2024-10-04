@@ -47,16 +47,16 @@ class ProductDetailsFragment : Fragment() {
         binding.upcTextView.text = "UPC: ${product.upcCode}"
 
         // Load the front image thumbnail
-        loadImageIntoView(product.frontImageUri, binding.frontImageThumbnail)
+        loadImageIntoView(product.frontImageThumbnailUri, binding.frontImageThumbnail)
 
         // Load the shelf-tag image thumbnail
-        loadImageIntoView(product.shelfTagUri, binding.shelfTagImageThumbnail)
+        loadImageIntoView(product.shelfTagThumbnailUri, binding.shelfTagImageThumbnail)
 
         // Load the back image thumbnail (if it exists)
         if (product.backImageUri != null) {
             binding.backImageThumbnail.visibility = View.VISIBLE
             binding.retakeBackImageButton.visibility = View.VISIBLE
-            loadImageIntoView(product.backImageUri, binding.backImageThumbnail)
+            loadImageIntoView(product.backImageThumbnailUri, binding.backImageThumbnail)
         } else {
             binding.backImageThumbnail.visibility = View.GONE
             binding.retakeBackImageButton.visibility = View.GONE

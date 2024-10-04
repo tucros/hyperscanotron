@@ -3,6 +3,8 @@ package com.example.hyperscan_o_tron.ui
 import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -26,6 +28,8 @@ import com.example.hyperscan_o_tron.data.Scan
 import com.example.hyperscan_o_tron.databinding.FragmentCaptureBinding
 import com.example.hyperscan_o_tron.utils.FileUtils
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -105,28 +109,31 @@ class CaptureFragment : Fragment() {
             upcCode = upcCode,
             scanId = scanId,
             timestamp = System.currentTimeMillis(),
-            shelfTagUri = null,
-            frontImageUri = null,
-            backImageUri = null
         )
 
         binding.captureShelfTagButton.setOnClickListener {
-            takePhoto(scan, "shelf_tag.jpg") { uri ->
+            takePhoto(scan, "shelf_tag.jpg") { uri, thumbnailUri ->
+                binding.shelfTagThumbnail.setImageURI(thumbnailUri)
                 product.shelfTagUri = uri.toString()
+                product.shelfTagThumbnailUri = thumbnailUri.toString()
                 Log.d(TAG, "Shelf-tag image saved at: $uri")
             }
         }
 
         binding.captureFrontButton.setOnClickListener {
-            takePhoto(scan, "front.jpg") { uri ->
+            takePhoto(scan, "front.jpg") { uri, thumbnailUri ->
+                binding.frontThumbnail.setImageURI(thumbnailUri)
                 product.frontImageUri = uri.toString()
+                product.frontImageThumbnailUri = thumbnailUri.toString()
                 Log.d(TAG, "Front image saved at: $uri")
             }
         }
 
         binding.captureBackButton.setOnClickListener {
-            takePhoto(scan, "back.jpg") { uri ->
+            takePhoto(scan, "back.jpg") { uri, thumbnailUri ->
+                binding.backThumbnail.setImageURI(thumbnailUri)
                 product.backImageUri = uri.toString()
+                product.backImageThumbnailUri = thumbnailUri.toString()
                 Log.d(TAG, "Back image saved at: $uri")
             }
         }
@@ -167,9 +174,9 @@ class CaptureFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    private fun takePhoto(scan: Scan, fileName: String, onImageSaved: (Uri) -> Unit) {
-        val scanFolder = FileUtils.createScanFolder(requireContext(), scan.id) ?: return
-        val photoUri = FileUtils.createImageFile(requireContext(), scanFolder, upcCode, fileName)
+    private fun takePhoto(scan: Scan, fileName: String, onImageSaved: (Uri, Uri) -> Unit) {
+        val photoFileName = "${upcCode}_$fileName"
+        val photoUri = FileUtils.createImageFile(requireContext(), scan.id, photoFileName)
 
         if (photoUri == null) {
             Log.e(TAG, "Failed to create file URI")
@@ -186,9 +193,9 @@ class CaptureFragment : Fragment() {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     lifecycleScope.launch {
-                        updateThumbnail(fileName, photoUri)
-                        onImageSaved(photoUri)
-                        Log.d(TAG, "Photo saved: $photoUri")
+                        val thumbnailUri = createThumbnail(photoUri, photoFileName)
+                        onImageSaved(photoUri, thumbnailUri!!)
+                        Log.d(TAG, "Photo saved: $photoUri, Thumbnail saved: $thumbnailUri")
                     }
                 }
 
@@ -207,11 +214,22 @@ class CaptureFragment : Fragment() {
         }
     }
 
-    private fun updateThumbnail(fileName: String, photoUri: Uri) {
-        when (fileName) {
-            "shelf_tag.jpg" -> binding.shelfTagThumbnail.setImageURI(photoUri)
-            "front.jpg" -> binding.frontThumbnail.setImageURI(photoUri)
-            "back.jpg" -> binding.backThumbnail.setImageURI(photoUri)
+    private fun createThumbnail(photoUri: Uri, fileName: String): Uri? {
+        try {
+            val inputStream = requireContext().contentResolver.openInputStream(photoUri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+
+            val thumbnail = Bitmap.createScaledBitmap(bitmap, 150, 150, true)
+            val thumbnailFile = File(requireContext().filesDir, "thumbnail_$fileName")
+            val fos = FileOutputStream(thumbnailFile)
+
+            thumbnail.compress(Bitmap.CompressFormat.JPEG, 80, fos)
+            fos.close()
+
+            return Uri.fromFile(thumbnailFile)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to create thumbnail: ${e.message}", e)
+            return null
         }
     }
 

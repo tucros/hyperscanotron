@@ -24,16 +24,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateScanFolder(scanId: Long, folderPath: String) {
-        viewModelScope.launch {
-            val scan = scanDao.getScanByIdSync(scanId)
-            if (scan != null) {
-                scan.folderPath = folderPath
-                scanDao.updateScan(scan)
-            }
-        }
-    }
-
     fun deleteScan(scan: Scan) {
         viewModelScope.launch {
             scanDao.deleteScan(scan)

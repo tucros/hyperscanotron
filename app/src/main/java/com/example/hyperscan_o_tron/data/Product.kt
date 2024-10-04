@@ -7,7 +7,10 @@ data class Product(
     val upcCode: String,
     val scanId: Long,
     val timestamp: Long,
-    var shelfTagUri: String?,
-    var frontImageUri: String?,
-    var backImageUri: String?
+    var shelfTagUri: String? = null,
+    var shelfTagThumbnailUri: String? = null,
+    var frontImageUri: String? = null,
+    var frontImageThumbnailUri: String? = null,
+    var backImageUri: String? = null,
+    var backImageThumbnailUri: String? = null
 )
